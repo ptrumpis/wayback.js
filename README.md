@@ -8,11 +8,83 @@
 # 🏛️ wayback.js
 The Wayback Availability JSON API in JavaScript.
 
-## 🚀 Usage
+## 🚀 Installation
 ### npm
 ```shell
 npm i wayback.js
 ```
+
+## 📦 Usage
+### Create an Instance
+```js
+import Wayback from 'wayback.js';
+
+const wb = new Wayback({
+  connectionTimeoutMs: 9000, // Timeout in ms
+  cacheTTL: 86400,           // Cache time-to-live in seconds
+  gcInterval: 3600,          // Garbage collection interval in seconds
+  headers: { ... }           // Optional headers
+});
+```
+
+### Check if a URL is Archived
+```js
+// Default check
+const archived = await wb.isArchived('https://example.com');
+console.log(archived);
+
+// With options
+const archivedOldest = await wb.isArchived('https://example.com', {
+  resolveRedirects: false,  // Skip resolving redirects
+  oldestArchive: true       // Request the oldest available archive
+});
+console.log(archivedOldest);
+```
+
+### Save a URL
+```js
+const saved = await wb.saveUrl('https://example.com');
+console.log(saved);
+```
+
+### Save Only If Outdated
+```js
+// Default 30 days max age
+const savedIfOld = await wb.saveOutdatedUrl('https://example.com');
+console.log(savedIfOld);
+
+// With options
+const savedIfOldest = await wb.saveOutdatedUrl(
+    'https://example.com',
+    90,  // Maximum age (in days)
+    resolveRedirects: false  // Skip resolving redirects
+);
+console.log(savedIfOldest);
+```
+
+### Resolve Redirects Before Archiving
+```js
+const finalUrl = await wb.getFinalRedirectUrl('https:/g.co/gsoc');
+console.log(finalUrl);
+```
+
+## 📚 API Reference
+| Method                         | Description                                                        |
+| ------------------------------ | ------------------------------------------------------------------ |
+| `isArchived`                   | Checks if the given URL is archived and returns snapshot info.     |
+| `saveUrl`                      | Saves the given URL to the Wayback Machine.                        |
+| `saveOutdatedUrl`              | Saves the URL only if the last archive is older than `maxAgeDays`. |
+| `getFinalRedirectUrl`          | Resolves redirects and returns the final destination URL.          |
+
+### Options
+**`isArchived` Options:**
+* **resolveRedirects** *(boolean)* — whether to follow redirects before checking archive (default: `true`)
+* **oldestArchive** *(boolean)* — if `true`, retrieves the oldest available snapshot instead of the latest (default: `false`)
+
+**`saveOutdatedUrl` Options:**
+* **maxAgeDays** *(number)* — maximum age (in days) of the last archive before re-saving (default: `30`)
+* **resolveRedirects** *(boolean)* — whether to follow redirects before checking archive age (default: `true`)
+
 
 ## ℹ️ Info
 ### Dependents

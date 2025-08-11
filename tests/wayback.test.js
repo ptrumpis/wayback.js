@@ -28,6 +28,19 @@ describe('Wayback class tests', function () {
         assert.deepStrictEqual(result, { url: 'http://example.com/123', timestamp: '20220101' });
     });
 
+    it('should return oldest archived snapshot', async function () {
+        global.fetch = async () => (
+            {
+            ok: true,
+            json: async () => ({
+                archived_snapshots: { closest: { url: 'http://web.archive.org/web/20020120142510/http://example.com:80/', timestamp: '20020120142510' } }
+            })
+        });
+
+        const result = await wayback.isArchived('http://example.com', { oldestArchive: true });
+        assert.deepStrictEqual(result, { url: 'http://web.archive.org/web/20020120142510/http://example.com:80/', timestamp: '20020120142510' });
+    });
+
     it('should return HTTP status 200 if URL is not archived', async function () {
         global.fetch = async () => ({
             ok: true,
